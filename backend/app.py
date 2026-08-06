@@ -1,7 +1,6 @@
 import os
 from functools import wraps
 from flask import Flask, request, session, redirect, url_for, render_template, flash
-from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from config import Config
 from models import db, Message
@@ -9,11 +8,21 @@ from routes import api_bp
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 def create_app(config_class=Config):
+    load_dotenv(override=True)
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Ensure instance folder exists and normalize relative SQLite URI if needed
+    if not os.path.exists(app.instance_path):
+        os.makedirs(app.instance_path, exist_ok=True)
+
+    db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    if db_uri and db_uri.startswith('sqlite:///instance/'):
+        rel_filename = db_uri.replace('sqlite:///instance/', '')
+        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(app.instance_path, rel_filename)}"
 
     # Allow CORS only for the frontend origin
     frontend_url = app.config.get('FRONTEND_URL', '*')
@@ -21,15 +30,12 @@ def create_app(config_class=Config):
 
     # Initialize extensions
     db.init_app(app)
-    bcrypt = Bcrypt(app)
 
     # Register blueprints
     app.register_blueprint(api_bp)
 
-    # Create tables (ensure instance folder exists)
+    # Create tables
     with app.app_context():
-        if not os.path.exists('instance'):
-            os.makedirs('instance')
         db.create_all()
 
     # Authentication decorator
@@ -65,12 +71,11 @@ def create_app(config_class=Config):
             username = request.form.get('username')
             password = request.form.get('password')
             admin_username = app.config.get('ADMIN_USERNAME')
-            admin_password_hash = app.config.get('ADMIN_PASSWORD_HASH')
+            admin_password = app.config.get('ADMIN_PASSWORD')
 
             if (
                 username == admin_username
-                and admin_password_hash
-                and bcrypt.check_password_hash(admin_password_hash, password)
+                and password == admin_password
             ):
                 session['admin_logged_in'] = True
                 flash('Login successful.', 'success')
