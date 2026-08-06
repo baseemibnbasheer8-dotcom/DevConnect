@@ -6,7 +6,7 @@ load_dotenv()
 
 class Config:
     # Flask Configuration
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'change-me')
+    SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
     # Database Configuration
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///instance/devconnect.db')
