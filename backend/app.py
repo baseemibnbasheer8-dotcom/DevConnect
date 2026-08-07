@@ -15,14 +15,6 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Ensure instance folder exists and normalize relative SQLite URI if needed
-    if not os.path.exists(app.instance_path):
-        os.makedirs(app.instance_path, exist_ok=True)
-
-    db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
-    if db_uri and db_uri.startswith('sqlite:///instance/'):
-        rel_filename = db_uri.replace('sqlite:///instance/', '')
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(app.instance_path, rel_filename)}"
 
     # Allow CORS only for the frontend origin
     frontend_url = app.config.get('FRONTEND_URL', '*')

@@ -4,13 +4,13 @@ DevConnect is a modern, clean, and responsive full-stack web application. It is 
 
 ## Features
 - **Frontend**: Built with React (Vite), React Router, Axios, and modern responsive CSS.
-- **Backend**: Built with Python Flask, Blueprint for API versioning (`/api/v1`), Flask-CORS, SQLAlchemy, and SQLite.
+- **Backend**: Built with Python Flask, Blueprint for API versioning (`/api/v1`), Flask-CORS, SQLAlchemy, and PostgreSQL.
 - **Pages**: Home, About (fetching from API), and Contact (submitting data to the database).
 - **Production Ready**: Uses environment variables, cleanly separated concerns, and centralized configurations.
 
 ## Technology Stack
 - **Frontend**: React (Vite), Axios, React Router, CSS
-- **Backend**: Python 3, Flask, SQLAlchemy, SQLite
+- **Backend**: Python 3, Flask, SQLAlchemy, PostgreSQL
 - **Deployment-Ready**: Ready for Nginx, Systemd, and Ansible
 
 ## Folder Structure
@@ -18,7 +18,6 @@ DevConnect is a modern, clean, and responsive full-stack web application. It is 
 ```
 DevConnect/
 ├── backend/                  # Flask REST API backend
-│   ├── instance/             # SQLite database location (ignored in Git)
 │   ├── app.py                # Application entry point
 │   ├── config.py             # Configuration and env vars
 │   ├── models.py             # SQLAlchemy models
@@ -40,6 +39,28 @@ DevConnect/
 ```
 
 ## Setup Instructions
+
+### PostgreSQL Database Setup (Ubuntu)
+
+1. Install PostgreSQL and required libraries:
+   ```bash
+   sudo apt update
+   sudo apt install postgresql postgresql-contrib libpq-dev python3-dev -y
+   ```
+2. Create the Database and User:
+   ```bash
+   sudo -u postgres psql
+   ```
+   *Inside the psql prompt run:*
+   ```sql
+   ALTER USER postgres PASSWORD 'postgres';
+   CREATE DATABASE devconnect;
+   \q
+   ```
+3. Test your connection:
+   ```bash
+   psql -U postgres -d devconnect
+   ```
 
 ### Backend Setup
 
@@ -64,7 +85,7 @@ DevConnect/
    ```bash
    python app.py
    ```
-   *The backend will run on `http://localhost:5000`. The SQLite database will be automatically created in `backend/instance/devconnect.db`.*
+   *The backend will run on `http://localhost:5000`. The PostgreSQL tables will be automatically created on startup.*
 
 ### Frontend Setup
 

@@ -9,7 +9,9 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
     # Database Configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///instance/devconnect.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    if not SQLALCHEMY_DATABASE_URI:
+        raise ValueError("No DATABASE_URL set for Flask application. Please configure it in your environment variables.")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Frontend Configuration
