@@ -1,0 +1,7 @@
+---
+- name: For testing condition
+  hosts: all
+  become: true
+
+  roles:
+    - common
