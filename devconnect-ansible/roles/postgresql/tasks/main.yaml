@@ -1,0 +1,35 @@
+---
+- name: Install postgreSQL
+  ansible.builtin.apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+    state: present
+    update_cache: true
+
+- name: Installing postgreSQL python Dependencies 
+  ansible.builtin.apt:
+    name:
+      - python3-psycopg2
+    state: present
+
+- name: Ensure postgreSQL is running
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Create postgreSQL user
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: "{{db_user}}"
+    password: "{{db_password}}"
+    state: present
+
+- name: Create postgreSQL database
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{db_name}}"
+    owner: "{{db_user}}"
+    state: present
+

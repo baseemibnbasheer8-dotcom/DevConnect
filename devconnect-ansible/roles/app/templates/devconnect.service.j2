@@ -1,0 +1,15 @@
+[Unit]
+Description=DevConnect Flask Application
+After=network.target postgresql.service
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/DevConnect/backend
+
+EnvironmentFile=/home/ubuntu/DevConnect/backend/.env
+
+ExecStart=/home/ubuntu/DevConnect/backend/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 app:app
+
+Restart=always
+RestartSec=5

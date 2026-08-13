@@ -1,0 +1,8 @@
+---
+
+- name: Restart DevConnect
+  ansible.builtin.systemd:
+    name: devconnect
+    state: restarted
+    daemon_reload: true
+    

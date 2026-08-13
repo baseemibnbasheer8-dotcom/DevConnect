@@ -1,0 +1,59 @@
+---
+
+- name: Install Nginx
+  ansible.builtin.apt:
+    name: 
+      - nginx
+      - nodejs
+      - npm
+    state: present
+    update_cache: true
+
+- name: Clone DevConnect repository
+  ansible.builtin.git:
+    repo: "https://github.com/baseemibnbasheer8-dotcom/DevConnect.git"
+    dest: /home/ubuntu/DevConnect
+    version: main
+    force: true
+
+- name: Install frontend dependencies
+  ansible.builtin.command:
+    cmd: npm install
+    chdir: /home/ubuntu/DevConnect/frontend
+
+- name: Build DevConnect frontend
+  ansible.builtin.command:
+    cmd: npm run build
+    chdir: /home/ubuntu/DevConnect/frontend
+  
+
+- name: Configure Nginx for DevConnect
+  ansible.builtin.template:
+    src: devconnect.conf.j2
+    dest: /etc/nginx/sites-available/devconnect
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Nginx
+
+- name: Enable DevConnect Nginx configuration
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/devconnect
+    dest: /etc/nginx/sites-enabled/devconnect
+    state: link
+
+- name: Remove default Nginx configuration
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Test Nginx configuration
+  ansible.builtin.command:
+    cmd: nginx -t
+  changed_when: false
+
+- name: Enable and start Nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: true

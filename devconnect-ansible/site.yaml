@@ -1,0 +1,28 @@
+---
+- name: Configuration for all servers
+  hosts: all
+  become: true
+
+  roles:
+    - common
+
+- name: Configuration of postgreSQL
+  hosts: app
+  become: true
+
+  roles:
+    - postgresql
+
+- name: Configuration for application
+  hosts: app
+  become: true
+
+  roles:
+    - app
+
+- name: Configuration of web server
+  hosts: web
+  become: true
+
+  roles:
+    - web

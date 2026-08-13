@@ -1,0 +1,52 @@
+---
+
+- name: Install Python and Git
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-venv
+      - python3-pip
+      - git
+    state: present
+    update_cache: true
+
+- name: Clone DevConnect repository
+  ansible.builtin.git:
+    repo: "https://github.com/baseemibnbasheer8-dotcom/DevConnect.git"
+    dest: /home/ubuntu/DevConnect
+    version: main
+    force: true
+    
+- name: Create Python virtual environment
+  ansible.builtin.command:
+    cmd: python3 -m venv /home/ubuntu/DevConnect/backend/venv
+    creates: /home/ubuntu/DevConnect/backend/venv/bin/activate
+
+- name: Install Python dependencies
+  ansible.builtin.pip:
+    requirements: /home/ubuntu/DevConnect/backend/requirements.txt
+    virtualenv: /home/ubuntu/DevConnect/backend/venv
+
+- name: Create application environment file
+  ansible.builtin.template:
+    src: env.j2
+    dest: /home/ubuntu/DevConnect/backend/.env
+    owner: ubuntu
+    group: ubuntu
+    mode: '0600'
+
+- name: Install systemd service for DevConnect
+  ansible.builtin.template:
+    src: devconnect.service.j2
+    dest: /etc/systemd/system/devconnect.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart DevConnect
+
+- name: Enable and start DevConnect
+  ansible.builtin.systemd:
+    name: devconnect
+    state: started
+    enabled: true
+    daemon_reload: true
