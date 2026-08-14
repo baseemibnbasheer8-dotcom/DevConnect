@@ -2,7 +2,7 @@ server {
     listen {{ nginx_port }};
     listen [::]:{{ nginx_port }};
 
-    server_name _;
+    server_name {{ web_public_ip }};
 
     root /home/ubuntu/DevConnect/frontend/dist;
     index index.html;
