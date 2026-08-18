@@ -12,12 +12,6 @@
 
   roles:
     - postgresql
-
-- name: Configuration for application
-  hosts: app
-  become: true
-
-  roles:
     - app
 
 - name: Configuration of web server
